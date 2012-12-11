@@ -132,7 +132,7 @@ char *kernelfull =
 "			n -= 2;\n" \
 "			mask >>= 2;\n" \
 "			tmpf = vtmp.x;\n" \
-"			if(gen1 != 3 && gen2 != 3)\n" \
+"			if(gen1 != 3 && gen2 != 3 && tmpf != -9)\n" \
 "			{\n" \
 // Convert genotypes to 2x2 genotype classes (9 genotype classes from 2 SNPs)
 // Count how many individuals for each class (stored locally in short int)
@@ -152,7 +152,7 @@ char *kernelfull =
 "			n -= 2;\n" \
 "			mask >>= 2;\n" \
 "			tmpf = vtmp.y;\n" \
-"			if(gen1 != 3 && gen2 != 3)\n" \
+"			if(gen1 != 3 && gen2 != 3 && tmpf != -9)\n" \
 "			{\n" \
 "				tmpi = 3*gen1 + gen2;\n" \
 "				factor_count[lad+tmpi] += 1;\n" \
@@ -168,7 +168,7 @@ char *kernelfull =
 "			n -= 2;\n" \
 "			mask >>= 2;\n" \
 "			tmpf = vtmp.z;\n" \
-"			if(gen1 != 3 && gen2 != 3)\n" \
+"			if(gen1 != 3 && gen2 != 3 && tmpf != -9)\n" \
 "			{\n" \
 "				tmpi = 3*gen1 + gen2;\n" \
 "				factor_count[lad+tmpi] += 1;\n" \
@@ -184,7 +184,7 @@ char *kernelfull =
 "			n -= 2;\n" \
 "			mask >>= 2;\n" \
 "			tmpf = vtmp.w;\n" \
-"			if(gen1 != 3 && gen2 != 3)\n" \
+"			if(gen1 != 3 && gen2 != 3 && tmpf != -9)\n" \
 "			{\n" \
 "				tmpi = 3*gen1 + gen2;\n" \
 "				factor_count[lad+tmpi] += 1;\n" \
@@ -211,7 +211,7 @@ char *kernelfull =
 "			gen2 = ((g2 & mask) >> n);\n" \
 "			n -= 2;\n" \
 "			tmpf = phen[k++];\n" \
-"			if(gen1 != 3 && gen2 != 3)\n" \
+"			if(gen1 != 3 && gen2 != 3 && tmpf != -9)\n" \
 "			{\n" \
 // Convert genotypes to 2x2 genotype classes (9 genotype classes from 2 SNPs)
 // Count how many individuals for each class (stored locally in short int)
@@ -359,7 +359,7 @@ char *kernelint =
 "			n -= 2;\n" \
 "			mask >>= 2;\n" \
 "			tmpf = vtmp.x;\n" \
-"			if(gen1 != 3 && gen2 != 3)\n" \
+"			if(gen1 != 3 && gen2 != 3 && tmpf != -9)\n" \
 "			{\n" \
 "				tmpi = 3*gen1 + gen2;\n" \
 "				factor_count[lad+tmpi] += 1;\n" \
@@ -375,7 +375,7 @@ char *kernelint =
 "			n -= 2;\n" \
 "			mask >>= 2;\n" \
 "			tmpf = vtmp.y;\n" \
-"			if(gen1 != 3 && gen2 != 3)\n" \
+"			if(gen1 != 3 && gen2 != 3 && tmpf != -9)\n" \
 "			{\n" \
 "				tmpi = 3*gen1 + gen2;\n" \
 "				factor_count[lad+tmpi] += 1;\n" \
@@ -391,7 +391,7 @@ char *kernelint =
 "			n -= 2;\n" \
 "			mask >>= 2;\n" \
 "			tmpf = vtmp.z;\n" \
-"			if(gen1 != 3 && gen2 != 3)\n" \
+"			if(gen1 != 3 && gen2 != 3 && tmpf != -9)\n" \
 "			{\n" \
 "				tmpi = 3*gen1 + gen2;\n" \
 "				factor_count[lad+tmpi] += 1;\n" \
@@ -407,7 +407,7 @@ char *kernelint =
 "			n -= 2;\n" \
 "			mask >>= 2;\n" \
 "			tmpf = vtmp.w;\n" \
-"			if(gen1 != 3 && gen2 != 3)\n" \
+"			if(gen1 != 3 && gen2 != 3 && tmpf != -9)\n" \
 "			{\n" \
 "				tmpi = 3*gen1 + gen2;\n" \
 "				factor_count[lad+tmpi] += 1;\n" \
@@ -433,7 +433,7 @@ char *kernelint =
 "			gen2 = ((g2 & mask) >> n);\n" \
 "			n -= 2;\n" \
 "			tmpf = phen[k++];\n" \
-"			if(gen1 != 3 && gen2 != 3)\n" \
+"			if(gen1 != 3 && gen2 != 3 && tmpf != -9)\n" \
 "			{\n" \
 // Convert genotypes to 2x2 genotype classes (9 genotype classes from 2 SNPs)
 // Count how many individuals for each class (stored locally in short int)
