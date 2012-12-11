@@ -1165,7 +1165,7 @@ void ereport(int ret, int code)
 	}
 	if(ret != CL_SUCCESS)
 	{
-		printf("\n\nAn error has occurred. Please fix me.\nError line %d\nCode %d\n",code,ret);
+		printf("\n\nThere was an error. \nError line %d\nCode %d\n",code,ret);
 		exit(code);
 	} else {
 		if(silent == 1)
