@@ -60,101 +60,57 @@ void dims(int *rowCount, int *colCount, char *filename)
 }
 
 void walkersalias(int n, float *p, int nans, int *ans)
-
 {
-
 	float *q, rU;
-
 	int i,j,k;
-
 	int *HL,*H,*L;
-
 	int *a;
-
 	float sum = 0;
 
-
-
 	a = (int *)malloc(n*sizeof(int));
-
 	HL = (int *)malloc(n*sizeof(int));
-
 	q = (float *)malloc(n*sizeof(float));
-
 	H = HL - 1; L = HL + n;
 
-	
-
 	for(i = 0; i < n; i++)
-
 	{
-
 		sum += p[i];
-
 	}
 
 	for(i = 0; i < n; i++)
-
 	{
-
 		p[i] /= sum;
-
 	}
 
 	for(i = 0; i < n; i++)
-
 	{
-
 		q[i] = p[i] * n;
-
 		if(q[i] < 1.) *++H = i; else *--L = i;
-
 	}
 
 	if(H >= HL && L < HL +n)
-
 	{
-
 		for(k = 0; k < n-1; k++)
-
 		{
-
 			i = HL[k];
-
 			j = *L;
-
 			a[i] = j;
-
 			q[j] += q[i] - 1;
-
 			if(q[j] < 1.) L++;
-
 			if(L >= HL + n) break;
-
 		}
-
 	}
 
 	for(i = 0; i < n; i++) q[i] += i;
-
 	for(i = 0; i < nans; i++)
-
 	{
-
 		rU = (float) rand() / RAND_MAX * n;
-
 		k = (int) rU;
-
 		ans[i] = (rU < q[k]) ? k : a[k];
-
 	}
-
 	free(HL);
-
 	free(q);
-
 	free(a);
-
 }
 
 
