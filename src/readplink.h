@@ -64,3 +64,8 @@ void extractfrombinary(char *binfile, char *pedfile, char *mapfile);
 char isbinary(int nid, ped *dat);
 void walkersalias(int n, float *p, int nans, int *ans);
 
+void readbinaryplink(int *nid, int *nsnp, int *npack, int *remain, int *nchr, map **genmap1, ped **dat1, int **gpack1, chromosome **chrstat1, char **filename);
+void dec2bin(unsigned int decimal, char *binary);
+char file_exists(const char * filename);
+void memory_calc(long bytes, char *size);
+
