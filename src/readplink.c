@@ -941,7 +941,7 @@ void simulate(int *nid, int *nsnp, int *nchr, map **genmap1, ped **dat1, char **
 // simulate epistatic QTL pairs in phenotype
 void simqtl(int nid, int nsnp, char *geno, ped *dat, map *genmap)
 {
-	int i, j, k, *X, nqtl, *qtl1, *qtl2, gcount[9], *buffer;
+	int i, j, k, *X, nqtl, *qtl1, *qtl2, gcount[9], *buffer, nmiss;
 	float gmean[9], gp[3] = {0.25,0.5,0.25};
 	char userread[20];
 	int pat[9] = {-1,0,1,0,0,0,1,0,-1};
@@ -1032,6 +1032,23 @@ void simqtl(int nid, int nsnp, char *geno, ped *dat, map *genmap)
 		printf("\n\n");
 	}
 	printf("Simulated %d QTL pair(s)\n\n",nqtl);
+
+	// Missing phenotypic values
+
+	printf("How many missing phenotypic values? --> ");
+	scanf("%s", &*userread);
+	nmiss = atoi(userread);
+	srand(time(0));
+	for(i = 0; i < nmiss; i++)
+	{
+		j = rand() % nid;
+		dat[j].phen = -9;
+	}
+	for(i = 0; i < 20; i++)
+	{
+		printf("%f ", dat[i].phen);
+	}
+
 }
 
 void bit_print(int a)
