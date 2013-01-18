@@ -1602,11 +1602,11 @@ int perform_scan(int *geno, chromosome *chrstat, ped *dat, map *genmap, int nid,
 							if(UTEST == 'f')
 							{
 	fprintf(OUT, "%d\t%s\t%s\t%d\t%s\t%s\t%d\t%d\t%f\n", \
-		results[l].snp1+1 + chrstat[i].chrstart, \
-		genmap[results[l].snp1 + chrstat[i].chrstart].snpname, \
+		results[l].snp1+1, \
+		genmap[results[l].snp1].snpname, \
 		chrstat[i].chrname, \
-		results[l].snp2+1 + chrstat[j].chrstart, \
-		genmap[results[l].snp2 + chrstat[j].chrstart].snpname, \
+		results[l].snp2+1, \
+		genmap[results[l].snp2].snpname, \
 		chrstat[j].chrname, \
 		results[l].df1, \
 		results[l].df2, \
