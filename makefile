@@ -9,7 +9,7 @@ LDFLAGS = -lm -Wall -O2 $(OP)
 SOURCES1 = src/main.c src/EpiOpenCL.c src/readplink.c src/readbplink.c src/timing.c
 OBJECTS1 = $(SOURCES1:.c=.o)
 
-EXE1 = exe/epiGPU
+EXE1 = epiGPU
 
 all: $(SOURCES1) $(EXE1)
 
