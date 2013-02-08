@@ -60,6 +60,7 @@ void createpackedbinary(int nid, int nsnp, int npack, int remain, int nchr, map 
 void unpack(int nid, int nsnp, int npack, int remain, int *gpack, char **geno1);
 void unpack2(int nid, int nsnp, int *gpack);
 void pack(int nid, int nsnp, int *npack, int *remain, int **gpack, char *geno);
+void pack2(int nid, int nsnp, int *gpack, char *geno);
 void bit_print(int a);
 void extractfrombinary(char *binfile, char *pedfile, char *mapfile);
 char isbinary(int nid, ped *dat);
@@ -70,4 +71,4 @@ void dec2bin(unsigned int decimal, char *binary);
 char file_exists(const char * filename);
 void memory_calc(long bytes, char *size);
 
-void bplink2geno(int nid, int nsnp, int *genop);
+void bplink2geno(int nid, int nsnp, int *genop, char *geno);

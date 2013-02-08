@@ -3,19 +3,20 @@
 
 char **get_space(int m, int n)
 {
-        char i, *p, **a;
-        p = malloc(m * n * sizeof(int));
-        a = malloc(m * sizeof(int *));
-        for(i = 0; i < m; i++) a[i] = p + (i * n);
-        return a;
+	int i;
+	char *p, **a;
+	p = malloc(m * n * sizeof(char));
+	a = malloc(m * sizeof(char *));
+	for(i = 0; i < m; i++) a[i] = p + (i * n);
+	return a;
 }
 
 void release_space(char** X)
 {
-        int * p;
-        p = (int *) X[0];
-        free(p);
-        free(X);
+	char * p;
+	p = (char *) X[0];
+	free(p);
+	free(X);
 }
 
 void general_dims(int *rowCount, int *colCount, char *filename)
@@ -300,20 +301,20 @@ void readplinkbedint(int nid, int nsnp, int *genop, char *bedfile)
 }
 
 // This function takes the readplinkbedint output and checks that it looks about right
-void bplink2geno(int nid, int nsnp, int *genop)
+void bplink2geno(int nid, int nsnp, int *genop, char *geno)
 {
-	int i, j, k, l, m, n, npack, remain;
+	int i, j, k, l, m, n, npack, remain, temp;
 	int size=16;
-	char *geno;
+//	char *geno;
 
-	geno = (char *)malloc(sizeof(char) * nid * nsnp);
+//	geno = (char *)malloc(sizeof(char) * nid * nsnp);
 
 	npack = (int) floor((float)nid / 16);	// print first few SNPs and individuals
 	remain = nid % 16;
 	l = 0; // number of individuals
 	m = 0; // number of packs
 
-	printf("npack = %d\nremain = %d\n\n", npack, remain);
+	printf("\nnpack = %d\nremain = %d\n\n", npack, remain);
 
 	// SNP major order
 	for(i = 0; i < nsnp; i++)
@@ -322,12 +323,16 @@ void bplink2geno(int nid, int nsnp, int *genop)
 		for(j = 0; j < npack; j++)
 		{
 			n = 3; // start at the end
-			for(k = 0; k < size; k++)
+			for(k = 0; k < size-1; k++)
 			{
 				geno[l] = ((genop[m] & n) >> (k*2));
 				l++;
 				n <<= 2;
 			}
+			temp = -((genop[m] & n) >> 30);
+			//printf("..%d",temp);
+			geno[l] = temp;
+			l++;
 			m++;
 		}
 		if(remain)
@@ -364,7 +369,7 @@ void bplink2geno(int nid, int nsnp, int *genop)
 		printf("\n");
 	}
 
-	free(geno);
+//	free(geno);
 }
 
 
@@ -469,14 +474,16 @@ void recodeplinkbedint(int nid, int nsnp, int *genop)
 				snp2 = 2;
 			}
 			recode <<= 2;
+			if(i < 100) printf("%d ", recode);
 			recode |= snp2;
+			if(i < 100) printf("%d; ", recode);
 //			if(i < 100) printf("%d ", recode);
 		}
 		if(i < 100)
 		{
 //			printf("%d %d %d; ", genop[i], recode, pack);
 		}
-//		if(i < 100) printf("\n");
+		if(i < 100) printf("\n");
 		genop[i] = recode;
 	}
 	printf("done!\n\n");
@@ -542,6 +549,50 @@ void memory_calc(long bytes, char *size)
 	}
 }
 
+void pack2(int nid, int nsnp, int *gpack, char *geno)
+{
+	int i, j, k, l, n, npack, remain;
+	int p, *gp;
+	int size = 16;
+
+	printf("converting to new binary\n"); fflush(stdout);
+
+	npack = (int)floor((double)nid / size);
+	remain = nid % size;
+	n = remain ? (npack + 1) : npack;
+
+	printf("npack = %d\nremain = %d\nn = %d\n", npack, remain, n);
+	fflush(stdout);
+
+	gp = (int *)malloc(sizeof(int) * n * nsnp);
+	
+	k = 0;
+	for(i = 0; i < nsnp; i++)
+	{
+		for(j = 0; j < npack; j++)
+		{
+			p = geno[k++];
+			for(l = 0; l < (size-1); l++)
+			{
+				p = (p << (32/size)) | geno[k++];
+			}
+			gp[(i*n + j)] = p;
+			//bit_print(p);
+		}
+		if(remain)
+		{
+			p = geno[k++];
+			for(l = 0; l < (remain-1); l++)
+			{
+				p = (p << (32/size)) | geno[k++];
+			}
+			gp[(i*n + j)] = p;
+			//bit_print(p);
+		}
+	}
+	&*gpack = gp;
+}
+
 
 void readbinaryplink(int *nid, int *nsnp, int *npack, int *remain, int *nchr, map **genmap1, ped **dat1, int **gpack1, chromosome **chrstat1, char **argv)
 {
@@ -552,6 +603,7 @@ void readbinaryplink(int *nid, int *nsnp, int *npack, int *remain, int *nchr, ma
 	map *genmap;
 	ped *dat;
 	char size[1000];
+	char *geno;
 
 //	strcpy(bedfile, filename);
 //	strcat(bedfile, ".bed");
@@ -587,8 +639,17 @@ void readbinaryplink(int *nid, int *nsnp, int *npack, int *remain, int *nchr, ma
 	// read binary format genotypes
 
 	readplinkbedint(*nid, *nsnp, genop, bedfile);
-	bplink2geno(*nid, *nsnp, genop);
-	recodeplinkbedint(*nid, *nsnp, genop);
+
+	memory_calc((long)(*nid * *nsnp * 1), size);
+	printf("Allocating CPU memory (%s)..........", size);
+	geno = malloc(sizeof(char) * *nid * *nsnp);
+	printf("Done!\n\n");
+
+	bplink2geno(*nid, *nsnp, genop, geno);
+	printf("converting to new binary\n"); fflush(stdout);
+
+	pack2(*nid, *nsnp, genop, geno);
+//	recodeplinkbedint(*nid, *nsnp, genop);
 	unpack2(*nid, *nsnp, genop);
 
 	chrstat = malloc(sizeof(chromosome) * 1000);
