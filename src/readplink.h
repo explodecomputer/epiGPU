@@ -58,9 +58,16 @@ void arguments(char **argv);
 void readpackedbinary(int *nid, int *nsnp, int *npack, int *remain, int *nchr, map **genmap1, ped **dat1, int **gpack1, chromosome **chrstat1, char *filename);
 void createpackedbinary(int nid, int nsnp, int npack, int remain, int nchr, map *genmap, ped *dat, int *gpack, chromosome *chrstat, char *filename);
 void unpack(int nid, int nsnp, int npack, int remain, int *gpack, char **geno1);
+void unpack2(int nid, int nsnp, int *gpack);
 void pack(int nid, int nsnp, int *npack, int *remain, int **gpack, char *geno);
 void bit_print(int a);
 void extractfrombinary(char *binfile, char *pedfile, char *mapfile);
 char isbinary(int nid, ped *dat);
 void walkersalias(int n, float *p, int nans, int *ans);
 
+void readbinaryplink(int *nid, int *nsnp, int *npack, int *remain, int *nchr, map **genmap1, ped **dat1, int **gpack1, chromosome **chrstat1, char **filename);
+void dec2bin(unsigned int decimal, char *binary);
+char file_exists(const char * filename);
+void memory_calc(long bytes, char *size);
+
+void bplink2geno(int nid, int nsnp, int *genop);

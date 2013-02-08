@@ -23,35 +23,60 @@
 // -I [n]	threshold2
 
 char *instructions =
-	"\n\nepiGPU functions in two modes, data management (D) and analysis (A)\n\n" \
-	"DATA MANAGEMENT MODE:\n\n" \
-	"<epiGPU> -D[ arguments ] [ filenames ... ]\n\n\n" \
-	"Arguments:\n\n" \
-	"r\tRead PLINK data\n" \
-	"c\tClean data, remove low call rate SNPs and individuals\n" \
-	"m\tImpute missing genotypes based on allele frequency\n" \
-	"n\tReplace phenotype with random normally distributed sample\n" \
-	"q\tSimulate AxA interactions at specific SNP pairs\n" \
-	"s\tSimulate entire dataset\n" \
-	"e\tExtract binary data to PLINK format\n\n" \
+	"\n" \
+	"Brief instructions:" \
+	"\n" \
+	"\n<epigpu> -A [ .bed file ] [ .bim file ] [ .fam file ] [ output file] [ Options ... ]\n" \
+	"\n" \
+	"Options:\n" \
+	"\n" \
+	"p [n]\t\tPermutation, default [n] = 0 (no permutation)\n" \
+	"i [n]\t\tIteration size, default [n] = 128\n" \
+	"d [n]\t\tDevice, default [n] = 0\n" \
+	"t [f/i]\t\tFull test or full test with interaction test, default = f\n" \
+	"F [n]\t\tF value threshold for full test, default [n] = 6.5\n" \
+	"I [n]\t\tF value threshold for interaction test, default [n] = 10.5\n" \
+	"s [0/1]\t\tNormal / Safe mode. Default = 0 (Normal mode)\n" \
+	"\n" \
 	"Example:\n" \
-	"<epigpu> -Drm [ .ped file ] [ .map file ] [ epigpu file ]\n" \
-	"<epigpu> -De [ .ped file ] [ .map file ] [ epigpu file ]\n" \
-	"<epigpu> -Dsq [ epigpu file ]\n\n\n\n" \
-	"ANALYSIS MODE:\n\n" \
-	"<epigpu> -A [ epigpu file] [ output file] [ Options ... ]\n\n" \
-	"Options:\n\n" \
-	"p [n]\tPermutation, default [n] = 0 (no permutation)\n" \
-	"i [n]\tIteration size, default [n] = 128\n" \
-	"d [n]\tDevice, default [n] = 0\n" \
-	"t [f/i]\tFull test or full test with interaction test, default = f\n" \
-	"F [n]\tF value threshold for full test, default [n] = 6.5\n" \
-	"I [n]\tF value threshold for interaction test, default [n] = 10.5\n" \
-	"s [0/1]\tNormal / Safe mode. Default = 0 (Normal mode)\n\n" \
-	"Example:\n" \
-	"<epigpu> -A [ epigpu file ] [ output file ]\n" \
-	"<epigpu> -A [ epigpu file ] [ output file ] -i 512 -p 100 -F 7\n\n\n\n" \
+	"<epigpu> -A [ binary plink file ] [ output file ] -i 512 -p 100 -F 7\n" \
+	"\n" \
+	"\n" \
 	"For additional help please see README.pdf\n\n\n";
+
+
+char *welcome =
+"\n\n" \
+"/======================================================================\\\n" \
+"||                                                                    ||\n" \
+"||                                epiGPU                              ||\n" \
+"||                               --------                             ||\n" \
+"||          Version: 1.2                                              ||\n" \
+"||     Release date: 5 April 2012                                     ||\n" \
+"||          Website: http://sourceforge.net/projects/epigpu/          ||\n" \
+"||                                                                    ||\n" \
+"||     This programme will perform an exhaustive 2D scan for          ||\n" \
+"||     epistasis, using the graphics card to improve speed            ||\n" \
+"||                                                                    ||\n" \
+"||     WARNING: Users may experience difficulty in performing         ||\n" \
+"||     other tasks while this programme runs.                         ||\n" \
+"||                                                                    ||\n" \
+"||     To interupt the scan press ctrl + c, and you will be able      ||\n" \
+"||     to resume later by using the same output file.                 ||\n" \
+"||                                                                    ||\n" \
+"||           Author: Gibran Hemani                                    ||\n" \
+"||          Contact: g.hemani@uq.edu.au                               ||\n" \
+"||                                                                    ||\n" \
+"||     Contributors: Thanos Theocharidis (University of Edinburgh)    ||\n" \
+"||                   Wenhua Wei (University of Edinburgh)             ||\n" \
+"||                   Chris Haley (University of Edinburgh)            ||\n" \
+"||                   Bertram Müller-Myhsok (Max Planck Institute)     ||\n" \
+"||                                                                    ||\n" \
+"||      epiGPU is licensed under a Creative Commons                   ||\n" \
+"||      Attribution-NonCommercial-ShareAlike 3.0 Unported License.    ||\n" \
+"||                                                                    ||\n" \
+"\\======================================================================/\n\n\n";
+
 
 
 // Parse analysis mode argument flags
@@ -60,19 +85,19 @@ void analysismodecl(int argc, char **argv, char **binfile, char **outfile)
 	int i, j, k;
 	FILE *file;
 
-	if(argc < 4 || (((int)argc & 1) != 0))
+	if(argc < 6 || (((int)argc & 1) != 0))
 	{
 		printf("Incorrect arguments\n");
 		ARGS;
 		exit(1);
 	}
-	parsefilename(argv[2]);
-	*binfile = argv[2];
-	*outfile = argv[3];
+//	parsefilename(argv[2]);
+//	*binfile = argv[2];
+	*outfile = argv[5];
 	silent = 0;
-	if(argc >= 4)
+	if(argc >= 6)
 	{
-		for(i = 4; i < argc; i+=2)
+		for(i = 6; i < argc; i+=2)
 		{
 			if(argv[i][0] != '-')
 			{
@@ -290,7 +315,9 @@ int main(int argc, char **argv)
 		"To interupt the scan press ctrl + c, and you will be able\n" \
 		"to resume later by using the same output file.\n\n\n");
 
-	readpackedbinary(&nid, &nsnp, &npack, &remain, &nchr, &genmap, &dat, &genop, &chrstat, binfile);
+//	readpackedbinary(&nid, &nsnp, &npack, &remain, &nchr, &genmap, &dat, &genop, &chrstat, binfile);
+	readbinaryplink(&nid, &nsnp, &npack, &remain, &nchr, &genmap, &dat, &genop, &chrstat, argv);
+
 
 	if((file = fopen(UPHEN, "r")))
 	{
