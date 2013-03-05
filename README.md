@@ -14,4 +14,7 @@ Still to be done:
 
 Master branch is stable. To build, just run:
 
+    git clone git://github.com/explodecomputer/epiGPU.git
+    cd epiGPU
     make
+
