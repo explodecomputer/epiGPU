@@ -1314,14 +1314,15 @@ int perform_scan(int *geno, chromosome *chrstat, ped *dat, map *genmap, int nid,
 	cl_context context;
 	cl_context_properties props[3];
 	cl_command_queue cmd_queue;
-	cl_device_id devices;
 	
 	cl_device_id devs[100];
 	cl_uint ndevs = 0;
 	cl_bool av[10];
 
-	cl_platform_id platform;
-	cl_uint ret_num_platforms;
+	cl_platform_id platforms[100];
+	cl_uint nplatforms = 0;
+	cl_uint platcount[100];
+
 	cl_int err;
 	cl_program program1;
 	cl_kernel kernel1;
@@ -1329,7 +1330,7 @@ int perform_scan(int *geno, chromosome *chrstat, ped *dat, map *genmap, int nid,
 	cl_ulong start, end;
 	double kerneltime;
 	char timetaken[50];
-	char build[2048], devname[2048];
+	char build[2048], devname[2048], platname[2048];
 	int tnhits = 0;
 	int *nhits = (int *)malloc(sizeof(int)*256);
 	int tothits = 0;
@@ -1379,19 +1380,45 @@ int perform_scan(int *geno, chromosome *chrstat, ped *dat, map *genmap, int nid,
 	}
 	
 	// Platform information
-	err = clGetPlatformIDs(1,&platform,&ret_num_platforms);   ereport(err,__LINE__);
-	props[0] = (cl_context_properties)CL_CONTEXT_PLATFORM;
-	props[1] = (cl_context_properties)platform;
-	props[2] = (cl_context_properties)0;
-	err = clGetDeviceIDs(platform,CL_DEVICE_TYPE_GPU, 1, &devices, NULL);   ereport(err,__LINE__);
+	err = clGetPlatformIDs(100, platforms, &nplatforms);   ereport(err,__LINE__);
 	
+	printf("\nInitialising GPU ... detected %d platform(s)\n", nplatforms);
+
 	// Device information
-	clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 100, devs, &ndevs);
+	// For each platform get device id
+	j = 0;
+	for(i = 0; i < nplatforms; i++)
+	{
+		clGetPlatformInfo(platforms[i],CL_PLATFORM_NAME,sizeof(platname),platname,NULL);   ereport(err,__LINE__);
+		clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 100, devs + j, &ndevs);   ereport(err,__LINE__);
+		printf("\nPlatform \"%s\" has %d GPU device(s)\n", platname, ndevs);   ereport(err,__LINE__);
+		j += ndevs;
+		platcount[i] = ndevs;
+	}
+	printf("\n");
+	ndevs = j;
+
+	// Which platform is the selcted device?
+	for(i = 0; i < nplatforms; i++)
+	{
+		if(i > 0)
+		{
+			platcount[i] += platcount[i-1];
+		}
+		if(UDEVICE < platcount[i])
+		{
+			props[0] = (cl_context_properties)CL_CONTEXT_PLATFORM;
+			props[1] = (cl_context_properties)platforms[i];
+			props[2] = (cl_context_properties)0;
+			break;
+		}
+	}
+
 	printf("Devices (availability):\n");
 	for(i = 0; (unsigned int)i < ndevs; i++)
 	{
-		clGetDeviceInfo(devs[i],CL_DEVICE_AVAILABLE,sizeof(cl_bool),&av[i],NULL);
-		clGetDeviceInfo(devs[i],CL_DEVICE_NAME,sizeof(devname),devname,NULL);
+		clGetDeviceInfo(devs[i],CL_DEVICE_AVAILABLE,sizeof(cl_bool),&av[i],NULL);   ereport(err,__LINE__);
+		clGetDeviceInfo(devs[i],CL_DEVICE_NAME,sizeof(devname),devname,NULL);   ereport(err,__LINE__);
 		printf("%d:\t%s (%d)\n",i,devname,av[i]);
 	}
 	// Check if device exists
