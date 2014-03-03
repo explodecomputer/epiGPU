@@ -1389,6 +1389,7 @@ int perform_scan(int *geno, chromosome *chrstat, ped *dat, map *genmap, int nid,
 	j = 0;
 	for(i = 0; i < nplatforms; i++)
 	{
+		ndevs = 0;
 		clGetPlatformInfo(platforms[i],CL_PLATFORM_NAME,sizeof(platname),platname,NULL);   ereport(err,__LINE__);
 		clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 100, devs + j, &ndevs);   ereport(err,__LINE__);
 		printf("\nPlatform \"%s\" has %d GPU device(s)\n", platname, ndevs);   ereport(err,__LINE__);
